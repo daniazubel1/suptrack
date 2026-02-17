@@ -128,6 +128,22 @@ export default function Dashboard() {
                 </button>
             </div>
 
+            {/* Low Stock Warning */}
+            {supplements.some(s => s.servingsLeft !== undefined && s.servingsLeft <= 5) && (
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+                    <div className="bg-amber-500/20 p-2 rounded-full shrink-0">
+                        <Activity size={20} className="text-amber-400" />
+                    </div>
+                    <div>
+                        <h3 className="text-amber-200 font-bold text-sm">Low Stock Alert</h3>
+                        <p className="text-amber-400/80 text-xs mt-1">
+                            {supplements.filter(s => s.servingsLeft !== undefined && s.servingsLeft <= 5).map(s => s.name).join(', ')}
+                            {supplements.filter(s => s.servingsLeft !== undefined && s.servingsLeft <= 5).length === 1 ? ' is' : ' are'} running low.
+                        </p>
+                    </div>
+                </div>
+            )}
+
             {/* Hero / Vitals Section */}
             <div className="relative overflow-hidden rounded-[2rem] bg-zinc-900 border border-white/5 p-7 animate-in fade-in slide-in-from-top-4">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />

@@ -5,7 +5,7 @@ import { Plus, Trash2, Edit2, X, Check, Pill, GlassWater, Cookie, Search, Info, 
 import { cn } from '../lib/utils';
 
 export default function SupplementManager() {
-    const { supplements, addSupplement, deleteSupplement, updateSupplement } = useSup();
+    const { supplements, addSupplement, deleteSupplement, updateSupplement, refillSupplement } = useSup();
     const [activeTab, setActiveTab] = useState('stack'); // 'stack' or 'discover'
     const [isAdding, setIsAdding] = useState(false);
     const [editingId, setEditingId] = useState(null);
@@ -17,21 +17,32 @@ export default function SupplementManager() {
         dosage: '',
         type: 'pill',
         timing: 'any',
+        servingsPerContainer: '',
+        servingsLeft: '',
         notes: ''
     });
 
     const resetForm = () => {
-        setFormData({ name: '', brand: '', dosage: '', type: 'pill', timing: 'any', notes: '' });
+        setFormData({ name: '', brand: '', dosage: '', type: 'pill', timing: 'any', servingsPerContainer: '', servingsLeft: '', notes: '' });
         setIsAdding(false);
         setEditingId(null);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        const dataToSave = {
+            ...formData,
+            servingsPerContainer: formData.servingsPerContainer ? parseInt(formData.servingsPerContainer) : undefined,
+            servingsLeft: (formData.servingsLeft !== undefined && formData.servingsLeft !== '')
+                ? parseInt(formData.servingsLeft)
+                : (formData.servingsPerContainer ? parseInt(formData.servingsPerContainer) : undefined)
+        };
+
         if (editingId) {
-            updateSupplement(editingId, formData);
+            updateSupplement(editingId, dataToSave);
         } else {
-            addSupplement(formData);
+            addSupplement(dataToSave);
         }
         resetForm();
         setActiveTab('stack');
@@ -84,7 +95,13 @@ export default function SupplementManager() {
                     <div className="flex justify-between items-center px-1">
                         <h2 className="text-2xl font-bold text-white">Your Supplements</h2>
                         <button
-                            onClick={() => setIsAdding(!isAdding)}
+                            onClick={() => {
+                                if (isAdding) {
+                                    resetForm();
+                                } else {
+                                    setIsAdding(true);
+                                }
+                            }}
                             className="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-full transition-colors shadow-lg shadow-indigo-500/20"
                         >
                             {isAdding ? <X size={24} /> : <Plus size={24} />}
@@ -130,6 +147,28 @@ export default function SupplementManager() {
                                             <option value="any">Anytime</option>
                                         </select>
                                     </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-zinc-400 mb-1.5">Container Size (Full)</label>
+                                        <input
+                                            type="number"
+                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-zinc-600 text-base"
+                                            placeholder="e.g. 60"
+                                            value={formData.servingsPerContainer}
+                                            onChange={(e) => setFormData({ ...formData, servingsPerContainer: e.target.value })}
+                                        />
+                                    </div>
+                                    {editingId && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-zinc-400 mb-1.5">Current Stock</label>
+                                            <input
+                                                type="number"
+                                                className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-zinc-600 text-base"
+                                                placeholder="Remaning..."
+                                                value={formData.servingsLeft ?? ''}
+                                                onChange={(e) => setFormData({ ...formData, servingsLeft: e.target.value })}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div>
@@ -190,6 +229,16 @@ export default function SupplementManager() {
                                             <div className="text-sm text-zinc-400 flex flex-wrap gap-2.5 mt-1.5">
                                                 <span className="bg-white/5 px-2 py-0.5 rounded flex items-center">{sup.dosage || 'N/A'}</span>
                                                 <span className="bg-white/5 px-2 py-0.5 rounded flex items-center capitalize">{sup.timing}</span>
+                                                {sup.servingsLeft !== undefined && (
+                                                    <span className={cn(
+                                                        "px-2 py-0.5 rounded flex items-center gap-1.5 border",
+                                                        sup.servingsLeft <= 5
+                                                            ? "bg-rose-500/10 text-rose-300 border-rose-500/20"
+                                                            : "bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
+                                                    )}>
+                                                        {sup.servingsLeft} left
+                                                    </span>
+                                                )}
                                                 {sup.foodReq === 'with-food' && (
                                                     <span className="bg-blue-500/10 text-blue-300 px-2 py-0.5 rounded flex items-center gap-1.5 border border-blue-500/20">
                                                         <Utensils size={14} /> Food
@@ -205,6 +254,14 @@ export default function SupplementManager() {
                                     </div>
 
                                     <div className="flex gap-2">
+                                        {(sup.servingsLeft !== undefined && sup.servingsLeft <= 5) && (
+                                            <button
+                                                onClick={() => refillSupplement(sup.id)}
+                                                className="px-3 py-1 bg-indigo-500/20 text-indigo-300 text-xs font-bold rounded-full border border-indigo-500/30 hover:bg-indigo-500/30 transition-colors"
+                                            >
+                                                Refill
+                                            </button>
+                                        )}
                                         <button onClick={() => handleEdit(sup)} className="p-2.5 text-zinc-500 hover:text-white hover:bg-white/10 rounded-full">
                                             <Edit2 size={20} />
                                         </button>
