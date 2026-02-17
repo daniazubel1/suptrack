@@ -69,6 +69,26 @@ npm run build
 ```
 This generates a `dist` folder ready for deployment.
 
+## 🌍 Deploying to the Web
+
+To use Suptrack on your phone **without** being on the same WiFi (aka from anywhere in the world), you need to host it on the internet.
+
+### Option 1: Vercel (Recommended ⚡)
+1.  Go to [Vercel.com](https://vercel.com) and sign up (login with GitHub).
+2.  Click **"Add New..."** -> **"Project"**.
+3.  Import your `suptrack` repository.
+4.  Click **"Deploy"**.
+    *   Vercel will automatically detect that it's a Vite project.
+5.  Once done, you'll get a URL like `https://suptrack-yourname.vercel.app`. Open this on your phone!
+
+### Option 2: Netlify
+1.  Go to [Netlify.com](https://netlify.com) and sign up with GitHub.
+2.  Click **"Add new site"** -> **"Import an existing project"**.
+3.  Select GitHub and choose your `suptrack` repo.
+4.  Click **"Deploy site"**.
+
+> **Note:** When you switch to the live website, your data won't be there automatically (because it's saved in your browser). Use the **Settings -> Share** feature to move your data from your local version to the live version.
+
 ## 📱 Mobile Use (PWA)
 Suptrack is a Progressive Web App. You can install it on your phone:
 1.  Open the app in Chrome/Safari on your phone.
