@@ -89,6 +89,13 @@ To use Suptrack on your phone **without** being on the same WiFi (aka from anywh
 
 > **Note:** When you switch to the live website, your data won't be there automatically (because it's saved in your browser). Use the **Settings -> Share** feature to move your data from your local version to the live version.
 
+## 🔒 Privacy & Data
+
+Suptrack is designed with **100% Privacy** in mind.
+- **No Database**: We do not have a backend server.
+- **Local Storage**: All your data (supplements, history, profile) is stored **only on your device** (in the browser's LocalStorage).
+- **You Own Your Data**: Export/Delete it anytime. Vercel/Netlify host the *app code*, but they **cannot** see your personal data.
+
 ## 📱 Mobile Use (PWA)
 Suptrack is a Progressive Web App. You can install it on your phone:
 1.  Open the app in Chrome/Safari on your phone.
