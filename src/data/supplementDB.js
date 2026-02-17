@@ -8,6 +8,7 @@ export const supplementDB = [
         dosage: '2,000 - 5,000 IU',
         bestTime: 'Morning',
         foodReq: 'with-food',
+        frequency: 'Daily',
         warning: 'Fat-soluble; take with a meal containing fat for absorption.',
         category: 'General Health'
     },
@@ -20,6 +21,7 @@ export const supplementDB = [
         dosage: '1,000 - 2,000 mg (EPA/DHA)',
         bestTime: 'Any',
         foodReq: 'with-food',
+        frequency: 'Daily',
         warning: 'Take with food to avoid "fish burps".',
         category: 'General Health'
     },
@@ -32,6 +34,7 @@ export const supplementDB = [
         dosage: '250 - 500 mg',
         bestTime: 'Morning',
         foodReq: 'empty-stomach',
+        frequency: 'Daily',
         warning: 'Best taken in the morning on an empty stomach for optimal absorption.',
         category: 'Longevity'
     },
@@ -44,6 +47,7 @@ export const supplementDB = [
         dosage: '100 - 200 mg',
         bestTime: 'Morning',
         foodReq: 'with-food',
+        frequency: 'Daily',
         warning: 'Fat-soluble; absorption is significantly better with food.',
         category: 'Longevity'
     },
@@ -56,6 +60,7 @@ export const supplementDB = [
         dosage: '200 - 400 mg',
         bestTime: 'Night',
         foodReq: 'any',
+        frequency: 'Daily',
         warning: 'Some forms (citrate) can have a laxative effect. Glycinate is best for sleep.',
         category: 'General Health'
     },
@@ -68,6 +73,7 @@ export const supplementDB = [
         dosage: '3,500 - 4,700 mg (Total Intake)',
         bestTime: 'Any',
         foodReq: 'with-food',
+        frequency: 'Daily',
         warning: 'Take with food and water to avoid stomach upset.',
         category: 'General Health'
     },
@@ -80,6 +86,7 @@ export const supplementDB = [
         dosage: '15 - 30 mg',
         bestTime: 'Any',
         foodReq: 'with-food',
+        frequency: 'Daily',
         warning: 'Do NOT take on an empty stomach; causes nausea.',
         category: 'General Health'
     },
@@ -92,6 +99,7 @@ export const supplementDB = [
         dosage: '500 - 1,000 mg',
         bestTime: 'Morning',
         foodReq: 'any',
+        frequency: 'Daily',
         warning: 'High doses can cause digestive issues.',
         category: 'Immunity'
     },
@@ -104,6 +112,7 @@ export const supplementDB = [
         dosage: '500 - 1,000 mg',
         bestTime: 'Morning',
         foodReq: 'any',
+        frequency: 'Daily',
         warning: 'Consistent daily use is required for benefits.',
         category: 'Nootropic'
     },
@@ -116,6 +125,7 @@ export const supplementDB = [
         dosage: '300 - 600 mg',
         bestTime: 'Night',
         foodReq: 'any',
+        frequency: 'Daily',
         warning: 'Can be sedating; often best taken in the evening.',
         category: 'Stress & Sleep'
     },
@@ -128,6 +138,7 @@ export const supplementDB = [
         dosage: '500 mg',
         bestTime: 'Morning',
         foodReq: 'with-food',
+        frequency: 'Daily',
         warning: 'Best absorbed when taken with bromelain or Vitamin C.',
         category: 'Immunity'
     },
@@ -141,6 +152,7 @@ export const supplementDB = [
         dosage: '5 g',
         bestTime: 'Post-Workout',
         foodReq: 'any',
+        frequency: 'Daily',
         warning: 'Ensure adequate water intake.',
         category: 'Performance'
     },
@@ -153,6 +165,7 @@ export const supplementDB = [
         dosage: '20 - 25 g',
         bestTime: 'Post-Workout',
         foodReq: 'any',
+        frequency: 'Workout Days',
         warning: 'Contains dairy (unless isolate/hydrolysate).',
         category: 'Performance'
     },
@@ -165,6 +178,7 @@ export const supplementDB = [
         dosage: '500 - 1,000 mg',
         bestTime: 'Morning',
         foodReq: 'with-food',
+        frequency: 'Daily',
         warning: 'Combine with fat (yogurt/oil) for absorption.',
         category: 'Longevity'
     }

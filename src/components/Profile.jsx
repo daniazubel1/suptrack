@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSup } from '../context/SupContext';
-import { User, Activity, Droplets, Scale, Ruler, Save, Sparkles, Plus, Check, X, Trophy } from 'lucide-react';
+import { User, Activity, Droplets, Scale, Ruler, Save, Sparkles, Plus, Check, X, Trophy, Bell, Info } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { supplementDB } from '../data/supplementDB';
 import { ACHIEVEMENTS } from '../data/achievements';
 
 export default function Profile() {
-    const { userProfile, updateProfile, addSupplement, deleteSupplement, supplements } = useSup();
+    const { userProfile, updateProfile, addSupplement, deleteSupplement, supplements, requestNotificationPermission } = useSup();
 
     const [formData, setFormData] = useState(userProfile);
     const [isEditing, setIsEditing] = useState(false);
@@ -277,6 +277,205 @@ export default function Profile() {
                         <p className="text-zinc-400 font-medium mb-2">Water Goal</p>
                         <p className="text-4xl font-bold text-blue-400 mb-2">{water}<span className="text-lg text-blue-500/60">L</span></p>
                         <p className="text-xs text-zinc-500">Minimum recommended daily intake</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Weekly Routine */}
+            <div className="bg-zinc-900 border border-white/5 rounded-3xl p-6 mb-8">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-500">
+                        <Activity size={20} />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-lg text-zinc-100">Weekly Routine</h3>
+                        <p className="text-sm text-zinc-500">Select your workout days.</p>
+                    </div>
+                </div>
+                <div className="flex justify-between gap-2">
+                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => {
+                        const isSelected = (userProfile.schedule?.workoutDays || []).includes(i);
+                        return (
+                            <button
+                                key={i}
+                                onClick={() => {
+                                    const currentDays = userProfile.schedule?.workoutDays || [];
+                                    const newDays = isSelected
+                                        ? currentDays.filter(d => d !== i)
+                                        : [...currentDays, i];
+                                    updateProfile({
+                                        schedule: { ...userProfile.schedule, workoutDays: newDays }
+                                    });
+                                }}
+                                className={cn(
+                                    "h-10 w-10 rounded-full font-bold text-sm transition-all flex items-center justify-center",
+                                    isSelected
+                                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                        : "bg-zinc-800 text-zinc-500 hover:bg-zinc-700"
+                                )}
+                            >
+                                {day}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Smart Notifications */}
+            <div className="bg-zinc-900 border border-white/5 rounded-3xl p-6 relative overflow-hidden mb-8">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+                        <Bell size={20} />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-lg text-zinc-100">Smart Notifications</h3>
+                        <p className="text-sm text-zinc-500">Customize your reminders.</p>
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    {/* Morning */}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-1 bg-amber-500 rounded-full" />
+                            <div>
+                                <p className="font-medium text-white">Morning Stack</p>
+                                <p className="text-xs text-zinc-500">Daily reminder</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="time"
+                                value={userProfile.notifications?.morning?.time || "08:00"}
+                                onChange={(e) => updateProfile({
+                                    notifications: {
+                                        ...userProfile.notifications,
+                                        morning: { ...userProfile.notifications.morning, time: e.target.value }
+                                    }
+                                })}
+                                disabled={!userProfile.notifications?.morning?.enabled}
+                                className="bg-black/30 border border-white/10 rounded-lg px-2 py-1 text-white text-sm focus:outline-none disabled:opacity-50"
+                            />
+                            <button
+                                onClick={() => {
+                                    if (!userProfile.notifications) requestNotificationPermission();
+                                    updateProfile({
+                                        notifications: {
+                                            ...userProfile.notifications,
+                                            morning: {
+                                                ...userProfile.notifications?.morning,
+                                                enabled: !userProfile.notifications?.morning?.enabled
+                                            }
+                                        }
+                                    });
+                                }}
+                                className={cn(
+                                    "w-10 h-6 rounded-full transition-colors relative",
+                                    userProfile.notifications?.morning?.enabled ? "bg-indigo-600" : "bg-zinc-700"
+                                )}
+                            >
+                                <span className={cn(
+                                    "absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform",
+                                    userProfile.notifications?.morning?.enabled ? "translate-x-4" : ""
+                                )} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Night */}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-1 bg-indigo-500 rounded-full" />
+                            <div>
+                                <p className="font-medium text-white">Night Stack</p>
+                                <p className="text-xs text-zinc-500">Daily reminder</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="time"
+                                value={userProfile.notifications?.night?.time || "21:00"}
+                                onChange={(e) => updateProfile({
+                                    notifications: {
+                                        ...userProfile.notifications,
+                                        night: { ...userProfile.notifications.night, time: e.target.value }
+                                    }
+                                })}
+                                disabled={!userProfile.notifications?.night?.enabled}
+                                className="bg-black/30 border border-white/10 rounded-lg px-2 py-1 text-white text-sm focus:outline-none disabled:opacity-50"
+                            />
+                            <button
+                                onClick={() => {
+                                    if (!userProfile.notifications) requestNotificationPermission();
+                                    updateProfile({
+                                        notifications: {
+                                            ...userProfile.notifications,
+                                            night: {
+                                                ...userProfile.notifications?.night,
+                                                enabled: !userProfile.notifications?.night?.enabled
+                                            }
+                                        }
+                                    });
+                                }}
+                                className={cn(
+                                    "w-10 h-6 rounded-full transition-colors relative",
+                                    userProfile.notifications?.night?.enabled ? "bg-indigo-600" : "bg-zinc-700"
+                                )}
+                            >
+                                <span className={cn(
+                                    "absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform",
+                                    userProfile.notifications?.night?.enabled ? "translate-x-4" : ""
+                                )} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Workout */}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-1 bg-emerald-500 rounded-full" />
+                            <div>
+                                <p className="font-medium text-white">Workout</p>
+                                <p className="text-xs text-zinc-500">On active days</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="time"
+                                value={userProfile.notifications?.workout?.time || "17:00"}
+                                onChange={(e) => updateProfile({
+                                    notifications: {
+                                        ...userProfile.notifications,
+                                        workout: { ...userProfile.notifications.workout, time: e.target.value }
+                                    }
+                                })}
+                                disabled={!userProfile.notifications?.workout?.enabled}
+                                className="bg-black/30 border border-white/10 rounded-lg px-2 py-1 text-white text-sm focus:outline-none disabled:opacity-50"
+                            />
+                            <button
+                                onClick={() => {
+                                    if (!userProfile.notifications) requestNotificationPermission();
+                                    updateProfile({
+                                        notifications: {
+                                            ...userProfile.notifications,
+                                            workout: {
+                                                ...userProfile.notifications?.workout,
+                                                enabled: !userProfile.notifications?.workout?.enabled
+                                            }
+                                        }
+                                    });
+                                }}
+                                className={cn(
+                                    "w-10 h-6 rounded-full transition-colors relative",
+                                    userProfile.notifications?.workout?.enabled ? "bg-indigo-600" : "bg-zinc-700"
+                                )}
+                            >
+                                <span className={cn(
+                                    "absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform",
+                                    userProfile.notifications?.workout?.enabled ? "translate-x-4" : ""
+                                )} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

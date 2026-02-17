@@ -248,8 +248,162 @@ export function SupProvider({ children }) {
         return () => clearTimeout(timeout);
     }, [history, supplements]); // Re-run when history/supplements change
 
+    // Notification Logic
+    const requestNotificationPermission = async () => {
+        if (!("Notification" in window)) {
+            alert("This browser does not support desktop notifications");
+            return false;
+        }
+
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            // Initialize default granular settings if they don't exist
+            setUserProfile(prev => ({
+                ...prev,
+                notifications: {
+                    ...(prev.notifications || {}),
+                    morning: prev.notifications?.morning || { enabled: true, time: "08:00" },
+                    night: prev.notifications?.night || { enabled: true, time: "21:00" },
+                    workout: prev.notifications?.workout || { enabled: false, time: "17:00" }
+                }
+            }));
+            new Notification("Notifications Enabled", {
+                body: "You can now customize your reminders in Profile.",
+                icon: '/pwa-192x192.png'
+            });
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    // Notification Scheduler
+    useEffect(() => {
+        // If no notifications object or permission not granted (implicit check via enabled states), skip
+        if (!userProfile?.notifications) return;
+
+        const checkReminders = () => {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMin = now.getMinutes();
+            const currentDay = now.getDay(); // 0 = Sun, 6 = Sat
+            const todayStr = now.toISOString().split('T')[0];
+            const logsToday = history[todayStr] || [];
+
+            // Helper to parse "HH:MM"
+            const parseTime = (timeStr) => {
+                const [h, m] = (timeStr || "00:00").split(':').map(Number);
+                return { h, m };
+            };
+
+            // Helper: Is now within 3 hours of target?
+            const isTimeWindow = (targetTimeStr) => {
+                const { h, m } = parseTime(targetTimeStr);
+                const targetVal = h * 60 + m;
+                const nowVal = currentHour * 60 + currentMin;
+                return nowVal >= targetVal && nowVal < (targetVal + 180);
+            };
+
+            // Helper: Get missing supplements for a timing category
+            const getMissingSups = (timingCategory) => {
+                const targetSups = supplements.filter(s => s.timing === timingCategory);
+                if (targetSups.length === 0) return [];
+                return targetSups.filter(s => !logsToday.some(l => l.supplementId === s.id));
+            };
+
+            // 1. Morning Check
+            const morningSettings = userProfile.notifications.morning;
+            if (morningSettings?.enabled && isTimeWindow(morningSettings.time)) {
+                if (morningSettings.lastRun !== todayStr) {
+                    const missing = getMissingSups('morning');
+                    if (missing.length > 0) {
+                        const items = missing.map(s => s.name).join(', ');
+                        new Notification("Morning Stack Reminder", {
+                            body: `Missing: ${items}`,
+                            icon: '/pwa-192x192.png'
+                        });
+                        // Update lastRun
+                        setUserProfile(prev => ({
+                            ...prev,
+                            notifications: {
+                                ...prev.notifications,
+                                morning: { ...prev.notifications.morning, lastRun: todayStr }
+                            }
+                        }));
+                    }
+                }
+            }
+
+            // 2. Night Check
+            const nightSettings = userProfile.notifications.night;
+            if (nightSettings?.enabled && isTimeWindow(nightSettings.time)) {
+                if (nightSettings.lastRun !== todayStr) {
+                    const missing = getMissingSups('night');
+                    if (missing.length > 0) {
+                        const items = missing.map(s => s.name).join(', ');
+                        new Notification("Night Stack Reminder", {
+                            body: `Time to sleep! Missing: ${items}`,
+                            icon: '/pwa-192x192.png'
+                        });
+                        setUserProfile(prev => ({
+                            ...prev,
+                            notifications: {
+                                ...prev.notifications,
+                                night: { ...prev.notifications.night, lastRun: todayStr }
+                            }
+                        }));
+                    }
+                }
+            }
+
+            // 3. Workout Check
+            const workoutSettings = userProfile.notifications.workout;
+            const workoutDays = userProfile.schedule?.workoutDays || [];
+
+            // Only check if today is a workout day
+            if (workoutSettings?.enabled && workoutDays.includes(currentDay) && isTimeWindow(workoutSettings.time)) {
+                if (workoutSettings.lastRun !== todayStr) {
+                    // Detect "Workout" or "Pre-workout" supplements (custom logic or timing='workout')
+                    // Currently DB uses timing='morning'/'night'/'any'. 
+                    // We might need to rely on 'bestTime' from DB or User defined timing. 
+                    // For now, let's search for "Work" in timing or name/category? 
+                    // Actually, let's look for supplements with timing='workout' (we need to add this option if not exists, 
+                    // but for now user might have 'any'. Let's Assume user categorizes Pre-workouts as 'any' or we add 'workout' timing).
+
+                    // Simple approach: Check for supplements containing "Creatine" or "Pre" or timing "workout" if we add it.
+                    // BETTER: Let's assume user puts them in 'any' or strict 'workout' timing.
+                    // For this MVP, let's filter for timing === 'workout'. We need to ensure AddSup allows this.
+                    const missing = supplements.filter(s =>
+                        (s.timing === 'workout' || s.name.toLowerCase().includes('creatine') || s.name.toLowerCase().includes('pre'))
+                        && !logsToday.some(l => l.supplementId === s.id)
+                    );
+
+                    if (missing.length > 0) {
+                        const items = missing.map(s => s.name).join(', ');
+                        new Notification("Workout Fuel Reminder", {
+                            body: `Crush your workout! Missing: ${items}`,
+                            icon: '/pwa-192x192.png'
+                        });
+                        setUserProfile(prev => ({
+                            ...prev,
+                            notifications: {
+                                ...prev.notifications,
+                                workout: { ...prev.notifications.workout, lastRun: todayStr }
+                            }
+                        }));
+                    }
+                }
+            }
+        };
+
+        const interval = setInterval(checkReminders, 60000); // Check every minute
+        checkReminders(); // Run immediately on load
+
+        return () => clearInterval(interval);
+    }, [userProfile, supplements, history]);
+
     return (
-        <SupContext.Provider value={{ supplements, history, lifestyle, userProfile, addSupplement, updateSupplement, deleteSupplement, toggleLog, refillSupplement, updateLifestyle, updateProfile, exportData, importData }}>
+        <SupContext.Provider value={{ supplements, history, lifestyle, userProfile, addSupplement, updateSupplement, deleteSupplement, toggleLog, refillSupplement, updateLifestyle, updateProfile, exportData, importData, requestNotificationPermission }}>
             {children}
         </SupContext.Provider>
     );

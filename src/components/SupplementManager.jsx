@@ -108,94 +108,113 @@ export default function SupplementManager() {
                         </button>
                     </div>
 
-                    {isAdding && (
-                        <div className="bg-zinc-900/50 border border-white/5 rounded-2xl p-6 animate-in fade-in slide-in-from-top-4">
-                            <form onSubmit={handleSubmit} className="space-y-5">
-                                <div>
-                                    <label className="block text-sm font-medium text-zinc-400 mb-1.5">Name</label>
-                                    <input
-                                        required
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-zinc-600 text-base"
-                                        placeholder="e.g. Creatine Monohydrate"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    />
+                    {(isAdding || editingId) && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+                            <div className="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95">
+                                <div className="p-6 border-b border-white/5 flex justify-between items-center sticky top-0 bg-zinc-900 z-10">
+                                    <h3 className="text-xl font-bold text-white">
+                                        {editingId ? 'Edit Supplement' : 'Add Supplement'}
+                                    </h3>
+                                    <button
+                                        onClick={resetForm}
+                                        className="p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-zinc-400 hover:text-white"
+                                    >
+                                        <X size={20} />
+                                    </button>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-zinc-400 mb-1.5">Dosage</label>
-                                        <input
-                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-zinc-600 text-base"
-                                            placeholder="e.g. 5g"
-                                            value={formData.dosage}
-                                            onChange={(e) => setFormData({ ...formData, dosage: e.target.value })}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-zinc-400 mb-1.5">Timing</label>
-                                        <select
-                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-base"
-                                            value={formData.timing}
-                                            onChange={(e) => setFormData({ ...formData, timing: e.target.value })}
-                                        >
-                                            <option value="morning">Morning</option>
-                                            <option value="pre-workout">Pre-Workout</option>
-                                            <option value="intra-workout">Intra-Workout</option>
-                                            <option value="post-workout">Post-Workout</option>
-                                            <option value="night">Night</option>
-                                            <option value="any">Anytime</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-zinc-400 mb-1.5">Container Size (Full)</label>
-                                        <input
-                                            type="number"
-                                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-zinc-600 text-base"
-                                            placeholder="e.g. 60"
-                                            value={formData.servingsPerContainer}
-                                            onChange={(e) => setFormData({ ...formData, servingsPerContainer: e.target.value })}
-                                        />
-                                    </div>
-                                    {editingId && (
+                                <div className="p-6">
+                                    <form onSubmit={handleSubmit} className="space-y-5">
                                         <div>
-                                            <label className="block text-sm font-medium text-zinc-400 mb-1.5">Current Stock</label>
+                                            <label className="block text-sm font-medium text-zinc-400 mb-1.5">Name</label>
                                             <input
-                                                type="number"
+                                                required
                                                 className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-zinc-600 text-base"
-                                                placeholder="Remaning..."
-                                                value={formData.servingsLeft ?? ''}
-                                                onChange={(e) => setFormData({ ...formData, servingsLeft: e.target.value })}
+                                                placeholder="e.g. Creatine Monohydrate"
+                                                value={formData.name}
+                                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                                autoFocus
                                             />
                                         </div>
-                                    )}
-                                </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-zinc-400 mb-1.5">Type</label>
-                                    <div className="flex gap-3">
-                                        {['pill', 'powder', 'liquid', 'food'].map(type => (
-                                            <button
-                                                key={type}
-                                                type="button"
-                                                onClick={() => setFormData({ ...formData, type })}
-                                                className={cn(
-                                                    "flex-1 py-3 rounded-lg text-sm font-medium border transition-all",
-                                                    formData.type === type
-                                                        ? "bg-indigo-500/20 border-indigo-500 text-indigo-300"
-                                                        : "bg-black/20 border-white/5 text-zinc-500 hover:bg-white/5"
-                                                )}
-                                            >
-                                                {type.charAt(0).toUpperCase() + type.slice(1)}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-zinc-400 mb-1.5">Dosage</label>
+                                                <input
+                                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-zinc-600 text-base"
+                                                    placeholder="e.g. 5g"
+                                                    value={formData.dosage}
+                                                    onChange={(e) => setFormData({ ...formData, dosage: e.target.value })}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-zinc-400 mb-1.5">Timing</label>
+                                                <select
+                                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-base"
+                                                    value={formData.timing}
+                                                    onChange={(e) => setFormData({ ...formData, timing: e.target.value })}
+                                                >
+                                                    <option value="morning">Morning</option>
+                                                    <option value="pre-workout">Pre-Workout</option>
+                                                    <option value="intra-workout">Intra-Workout</option>
+                                                    <option value="post-workout">Post-Workout</option>
+                                                    <option value="night">Night</option>
+                                                    <option value="any">Anytime</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-zinc-400 mb-1.5">Container Size (Full)</label>
+                                                <input
+                                                    type="number"
+                                                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-zinc-600 text-base"
+                                                    placeholder="e.g. 60"
+                                                    value={formData.servingsPerContainer}
+                                                    onChange={(e) => setFormData({ ...formData, servingsPerContainer: e.target.value })}
+                                                />
+                                            </div>
+                                            {editingId && (
+                                                <div>
+                                                    <label className="block text-sm font-medium text-zinc-400 mb-1.5">Current Stock</label>
+                                                    <input
+                                                        type="number"
+                                                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-zinc-600 text-base"
+                                                        placeholder="Remaning..."
+                                                        value={formData.servingsLeft ?? ''}
+                                                        onChange={(e) => setFormData({ ...formData, servingsLeft: e.target.value })}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-zinc-400 mb-1.5">Type</label>
+                                            <div className="flex gap-3">
+                                                {['pill', 'powder', 'liquid', 'food'].map(type => (
+                                                    <button
+                                                        key={type}
+                                                        type="button"
+                                                        onClick={() => setFormData({ ...formData, type })}
+                                                        className={cn(
+                                                            "flex-1 py-3 rounded-lg text-sm font-medium border transition-all",
+                                                            formData.type === type
+                                                                ? "bg-indigo-500/20 border-indigo-500 text-indigo-300"
+                                                                : "bg-black/20 border-white/5 text-zinc-500 hover:bg-white/5"
+                                                        )}
+                                                    >
+                                                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-2">
+                                            <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.98] text-base">
+                                                {editingId ? 'Update Supplement' : 'Add to Stack'}
                                             </button>
-                                        ))}
-                                    </div>
+                                        </div>
+                                    </form>
                                 </div>
-
-                                <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.98] text-base">
-                                    {editingId ? 'Update Supplement' : 'Add to Stack'}
-                                </button>
-                            </form>
+                            </div>
                         </div>
                     )}
 

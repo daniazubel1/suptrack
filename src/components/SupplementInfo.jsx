@@ -88,7 +88,14 @@ export default function SupplementInfo() {
                         </p>
 
                         <div className="space-y-3">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div className="bg-black/20 rounded-xl p-3 border border-white/5">
+                                    <div className="flex items-center gap-2 text-indigo-400 mb-1">
+                                        <Clock size={14} />
+                                        <span className="text-xs font-semibold">Frequency</span>
+                                    </div>
+                                    <p className="text-sm text-zinc-200 font-medium break-words">{sup.frequency || 'Daily'}</p>
+                                </div>
                                 <div className="bg-black/20 rounded-xl p-3 border border-white/5">
                                     <div className="flex items-center gap-2 text-indigo-400 mb-1">
                                         <Pill size={14} />
@@ -99,7 +106,7 @@ export default function SupplementInfo() {
                                 <div className="bg-black/20 rounded-xl p-3 border border-white/5">
                                     <div className="flex items-center gap-2 text-emerald-400 mb-1">
                                         <Clock size={14} />
-                                        <span className="text-xs font-semibold">Timing</span>
+                                        <span className="text-xs font-semibold">Rec. Timing</span>
                                     </div>
                                     <p className="text-sm text-zinc-200 font-medium break-words">{sup.bestTime}</p>
                                 </div>
